@@ -122,3 +122,5 @@ The first Thunderbird startup after maintenance may be slower.
 Thunderbird rebuilds indexes automatically.
 
 Subsequent startups are usually much faster.
+
+Fater, Unified foldler may be gone (unvisible). To show it again, go to Thunderbird settings --> View --> Folders --> Unified Folders. Then, move it up to the top of the folder list.
