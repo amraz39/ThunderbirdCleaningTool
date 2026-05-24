@@ -1,11 +1,8 @@
 # Thunderbird Maintenance Tool
 
-
 A safe and advanced maintenance utility for Mozilla Thunderbird.
 
-
 The tool focuses on:
-
 
 - profile cleanup
 - cache/index rebuilding
@@ -17,21 +14,15 @@ The tool focuses on:
 - SQLite validation
 - performance recommendations
 
-
 The tool NEVER deletes actual email content.
-
 
 ---
 
-
 # Features
-
 
 ## Safe Operations
 
-
 The tool safely removes ONLY rebuildable cache/index files:
-
 
 - `.msf`
 - `global-messages-db.sqlite`
@@ -41,22 +32,16 @@ The tool safely removes ONLY rebuildable cache/index files:
 - `cache2/`
 - `startupCache/`
 
-
 Optional advanced cleanup:
-
 
 - `panacea.dat`
 - `OfflineCache/`
 
-
 with explicit user confirmation.
-
 
 ---
 
-
 # Additional Diagnostics
-
 
 - detects giant mbox files
 - detects suspicious zero-byte indexes
@@ -68,15 +53,11 @@ with explicit user confirmation.
 - orphaned cache detection
 - antivirus recommendations
 
-
 ---
-
 
 # Safety Design
 
-
 The tool:
-
 
 - NEVER deletes real mail containers
 - NEVER deletes prefs.js
@@ -85,39 +66,56 @@ The tool:
 - creates detailed logs
 - supports dry-run mode
 
-
 ---
 
-
 # Requirements
-
 
 - Python 3.10+
 - Windows recommended
 
-
 Install dependencies:
-
 
 ```bash
 pip install -r requirements.txt
-Usage
-Analyze only
+````
+
+---
+
+# Usage
+
+## Analyze only
+
+```bash
 python thunderbird_maintenance.py --dry-run
-Full maintenance
+```
+
+## Full maintenance
+
+```bash
 python thunderbird_maintenance.py
-Custom backup path
+```
+
+## Custom backup path
+
+```bash
 python thunderbird_maintenance.py --backup D:\\TBBackup
-Recommended Thunderbird Settings
+```
+
+---
+
+# Recommended Thunderbird Settings
 
 For best performance:
 
-Disable global indexing
-Reduce offline synchronization
-Compact folders regularly
-Avoid huge Inbox folders
-Exclude Thunderbird profile from antivirus scanning
-Important Notes
+1. Disable global indexing
+2. Reduce offline synchronization
+3. Compact folders regularly
+4. Avoid huge Inbox folders
+5. Exclude Thunderbird profile from antivirus scanning
+
+---
+
+# Important Notes
 
 The first Thunderbird startup after maintenance may be slower.
 

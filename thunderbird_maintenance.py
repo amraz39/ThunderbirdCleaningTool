@@ -434,6 +434,135 @@ def save_report(report: dict):
 
 
 # ===========================================================
+# PROFILE SELECTION
+# ===========================================================
+
+
+def detect_default_profiles_ini():
+    """
+    Parse Thunderbird profiles.ini to detect:
+    - default profile
+    - profile paths
+    - relative paths
+    """
+
+    appdata = os.getenv("APPDATA")
+
+    if not appdata:
+        return {}
+
+    ini_path = Path(appdata) / "Thunderbird" / "profiles.ini"
+
+    if not ini_path.exists():
+        return {}
+
+    profiles = {}
+    current = {}
+
+    try:
+
+        with open(ini_path, "r", encoding="utf-8") as f:
+
+            for line in f:
+
+                line = line.strip()
+
+                if not line:
+                    continue
+
+                if line.startswith("[Profile"):
+
+                    if current:
+                        profiles[current.get("Path", "unknown")] = current
+
+                    current = {}
+                    continue
+
+                if "=" in line:
+                    key, value = line.split("=", 1)
+                    current[key.strip()] = value.strip()
+
+            if current:
+                profiles[current.get("Path", "unknown")] = current
+
+    except Exception:
+        return {}
+
+    return profiles
+
+
+
+def print_profile_selection(profiles):
+    """
+    Display interactive profile selection menu.
+    """
+
+    logger.info("")
+    logger.info("Detected Thunderbird profiles:")
+    logger.info("")
+
+    ini_profiles = detect_default_profiles_ini()
+
+    indexed_profiles = []
+
+    for idx, profile in enumerate(profiles, start=1):
+
+        stats = analyze_profile(profile)
+
+        size = human_size(stats["size"])
+
+        default_marker = ""
+
+        for ini_path, meta in ini_profiles.items():
+
+            if profile.name in ini_path:
+
+                if meta.get("Default") == "1":
+                    default_marker = " [DEFAULT]"
+
+        logger.info(
+            f"[{idx}] {profile.name:<35} {size:>10}{default_marker}"
+        )
+
+        indexed_profiles.append(profile)
+
+    logger.info("")
+    logger.info("Selection options:")
+    logger.info("  single number        -> one profile")
+    logger.info("  comma-separated list -> multiple profiles")
+    logger.info("  all                  -> all profiles")
+    logger.info("")
+
+    while True:
+
+        choice = input("Select profile(s): ").strip().lower()
+
+        if choice == "all":
+            return indexed_profiles
+
+        try:
+
+            indexes = [
+                int(x.strip())
+                for x in choice.split(",")
+            ]
+
+            selected = []
+
+            for idx in indexes:
+
+                if idx < 1 or idx > len(indexed_profiles):
+                    raise ValueError
+
+                selected.append(indexed_profiles[idx - 1])
+
+            return selected
+
+        except Exception:
+            logger.warning("Invalid selection. Try again.")
+
+
+# ===========================================================
 # MAIN
 # ===========================================================
 
@@ -487,6 +616,13 @@ def main():
 
     logger.info(f"Found {len(profiles)} profile(s)")
 
+    selected_profiles = print_profile_selection(profiles)
+
+    logger.info("")
+    logger.info(
+        f"Selected {len(selected_profiles)} profile(s) for maintenance"
+    )
+
     report = {
         "timestamp": datetime.now().isoformat(),
         "profiles": [],
@@ -495,7 +631,7 @@ def main():
     backup_root = Path(args.backup)
     backup_root.mkdir(parents=True, exist_ok=True)
 
-    for profile in profiles:
+    for profile in selected_profiles:
 
         logger.info("=" * 70)
         logger.info(f"PROFILE: {profile.name}")
