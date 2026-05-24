@@ -687,6 +687,7 @@ def main():
     save_report(report)
 
     logger.info("DONE")
+    logger.info("If Unified folder is gone, go to View --> Folders --> Unified Folders --> then bring it UP.")
     logger.info(f"Detailed log: {log_file}")
 
 
